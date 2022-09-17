@@ -1,16 +1,36 @@
-import * as dotenv from "dotenv";
 import express from "express";
-import { weatherHandler } from "./weather.mjs";
+import http from "node:http";
+import { Server } from "socket.io";
+import { fetchWeather } from "./weather.mjs";
 
-dotenv.config();
+let currentWeather = await fetchWeather();
 
+// HTTP server & websockets
 const app = express();
-const port = 3000;
+const port = process.env.PAJASCREEN_PORT || 3000;
+const server = http.createServer(app);
+const io = new Server(server);
 
 app.use(express.static("public"));
 
-app.get("/weather", weatherHandler);
+io.on("connection", (socket) => {
+	console.log(`New socket connection (${socket.id})`);
 
-const server = app.listen(port, () => {
-	console.log(`Pajascreen running on port ${port}.`);
+	socket.emit("weather", currentWeather);
+
+	socket.on("disconnect", () => {
+		console.log(`Socket connection closed (${socket.id})`);
+	});
 });
+
+server.listen(port, () => {
+	console.log(`Pajascreen running on port ${port}`);
+});
+
+// Weather data poll
+
+const DELAY = 1000 * 60 * 10;	// 10min
+setInterval(async () => {
+	currentWeather = await fetchWeather();
+	io.sockets.emit("weather", currentWeather);
+}, DELAY);

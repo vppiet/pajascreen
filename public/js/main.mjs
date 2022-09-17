@@ -1,7 +1,10 @@
 import { updateClock } from "./clock.mjs"
 import { updateDate } from "./date.mjs"
+import { initializeWebSocket } from "./websocket.mjs";
 
-const TIMER_DELAY_MS = 1000;
+initializeWebSocket();
+
+const DELAY_MS = 1000;
 
 function updateInterface() {
 	let now = new Date();
@@ -11,4 +14,4 @@ function updateInterface() {
 }
 
 updateInterface();
-window.setInterval(updateInterface, TIMER_DELAY_MS);
+window.setInterval(updateInterface, DELAY_MS);
