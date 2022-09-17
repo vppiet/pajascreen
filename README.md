@@ -1,1 +1,5 @@
-# pajascreen
+# Pajascreen
+
+## Main Elements
+- Clock
+- Date

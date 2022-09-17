@@ -1,0 +1,31 @@
+body {
+	font-family: "Roboto Mono", Arial;
+	margin: 0;
+	padding: 0;
+}
+
+#container {
+	align-items: center;
+	background-color: #c88719;
+	flex-direction: column;
+	display: flex;
+	height: 100vh;
+	justify-content: center;
+}
+
+#clock {
+	background-color: #ffb74d;
+	font-size: 25vw;
+	text-align: center;
+	width: 100%;
+}
+
+#subcontainer {
+	background-color: #ffb74d;
+	display: flex;
+	flex-direction:	row;
+	font-size: 4vw;
+	gap: 1em;
+	justify-content: center;
+	width: 100%;
+}
