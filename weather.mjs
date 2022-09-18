@@ -12,12 +12,12 @@ function isEnabled() {
 async function fetchWeather() {
 	return await axios(config)
 		.then((res) => {
-			console.log(`Got data (${res.status})`);
+			console.log(`Got data from OpenWeatherMap (${res.status})`);
 			return res.data;
 		})
 		.catch((err) => {
-			console.log("API error")
-			return { error: "API error" };
+			console.log("OpenWeatherMap API error")
+			return { error: "OpenWeatherMap API error" };
 		});
 }
 

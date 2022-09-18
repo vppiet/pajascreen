@@ -1,11 +1,28 @@
 import express from "express";
 import http from "node:http";
 import { Server } from "socket.io";
-import { fetchWeather } from "./weather.mjs";
+import { fetchWeather as fetchWeatherData } from "./weather.mjs";
 
-let currentWeather = await fetchWeather();
+// Weather Data Cache
+
+let weatherDataCacheTimestamp = undefined;
+let weatherDataCache = undefined;
+
+async function updateWeatherDataCache() {
+	weatherDataCache = await fetchWeatherData();
+	weatherDataCacheTimestamp = Date.now();
+	return weatherDataCache;
+}
+
+function isWeatherDataCacheTooOld() {
+	if (!weatherDataCacheTimestamp) return false;
+	return (Date.now() - weatherDataCacheTimestamp) > POLLING_DELAY;
+}
+
+updateWeatherDataCache();
 
 // HTTP server & websockets
+
 const app = express();
 const port = process.env.PAJASCREEN_PORT || 3000;
 const server = http.createServer(app);
@@ -13,10 +30,12 @@ const io = new Server(server);
 
 app.use(express.static("public"));
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
 	console.log(`New socket connection (${socket.id})`);
 
-	socket.emit("weather", currentWeather);
+	if (isWeatherDataCacheTooOld()) { await updateWeatherDataCache(); }
+
+	socket.emit("weather", weatherDataCache);
 
 	socket.on("disconnect", () => {
 		console.log(`Socket connection closed (${socket.id})`);
@@ -27,10 +46,16 @@ server.listen(port, () => {
 	console.log(`Pajascreen running on port ${port}`);
 });
 
-// Weather data poll
+// Weather data polling
 
-const DELAY = 1000 * 60 * 10;	// 10min
+const POLLING_DELAY = 1000 * 60 * 10;	// 10min
+
 setInterval(async () => {
-	currentWeather = await fetchWeather();
-	io.sockets.emit("weather", currentWeather);
-}, DELAY);
+	const sockets = await io.sockets.allSockets();
+
+	// don't update the cache if there are no clients listening
+	if (sockets.size) {
+		const data = updateWeatherDataCache();
+		io.sockets.emit("weather", data);
+	}
+}, POLLING_DELAY);
