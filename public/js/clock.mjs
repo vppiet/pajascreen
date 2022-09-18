@@ -14,4 +14,4 @@ function updateClock(now) {
 	CLOCK_ELEMENT.textContent = `${hours}:${minutes}`;
 }
 
-export { CLOCK_ELEMENT, updateClock };
+export { updateClock };

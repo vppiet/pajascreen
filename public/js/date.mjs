@@ -1,17 +1,17 @@
 const DATE_ELEMENT = document.getElementById("date");
 
-const DAY_NUMBERS_AND_NAMES = new Map()
-	.set(0, "ma")
-	.set(1, "ti")
-	.set(2, "ke")
-	.set(3, "to")
-	.set(4, "pe")
-	.set(5, "la")
-	.set(6, "su");
+const DAY_NUMBERS_AND_NAMES_MAPPING = new Map()
+	.set(0, "su")
+	.set(1, "ma")
+	.set(2, "ti")
+	.set(3, "ke")
+	.set(4, "to")
+	.set(5, "pe")
+	.set(6, "la");
 
 function updateDate(now) {
 	const dayNameNumber = now.getDay();
-	const dayName = DAY_NUMBERS_AND_NAMES.get(dayNameNumber);
+	const dayName = DAY_NUMBERS_AND_NAMES_MAPPING.get(dayNameNumber);
 
 	const day = now.getDate();
 	const month = now.getMonth();
@@ -20,4 +20,4 @@ function updateDate(now) {
 	DATE_ELEMENT.textContent = `${dayName} ${day}.${month}.${year}`
 }
 
-export { DATE_ELEMENT, updateDate };
+export { updateDate };
